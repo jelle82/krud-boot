@@ -10,8 +10,6 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
 
-
-
 @SpringBootTest
 @Testcontainers
 class UserTCTest {
@@ -29,20 +27,22 @@ class UserTCTest {
     }
 
     @Test
-    fun name() {
+    fun `save and update`() {
 
-        val firstMappedPort = db.getFirstMappedPort()
-        users.save(
-            User(null, "Jenn")
-        )
-        val save = users.save(
-            User(null, "Mike")
-        )
-
-
+        val save = users.save(aNewUser("Mike"))
         assertThat(users.findById(save.publicId!!).get().name).isEqualTo("Mike")
-
+        users.save(anExistingUser(save.publicId!!, "John"))
+        assertThat(users.findById(save.publicId!!).get().name).isEqualTo("John")
     }
 
+    @Test
+    fun `find by name`() {
+        val mike = users.save(aNewUser("Mike"))
+        assertThat(users.findByName("Mike").get()).isEqualTo(mike)
+    }
 
 }
+
+
+private fun anExistingUser(publicId: String, name: String) = User(publicId, name)
+private fun aNewUser(name: String) = User(null, name)
