@@ -1,5 +1,5 @@
 <ul>
     <#list users as user>
-        <li>Name: ${user.name}, Age: ${user.age}</li>
+        <li>Name: ${user.name}</li>
     </#list>
 </ul>

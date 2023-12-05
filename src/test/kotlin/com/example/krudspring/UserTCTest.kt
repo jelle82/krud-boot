@@ -20,7 +20,7 @@ class UserTCTest {
     companion object {
         @Container
         @ServiceConnection
-        var db: MariaDBContainer<*> = MariaDBContainer("mariadb:10.5.5").apply {
+        var db: MariaDBContainer<*> = MariaDBContainer("mariadb:10.6.16").apply {
             setPortBindings(listOf("50001:3306"))
         }
 
