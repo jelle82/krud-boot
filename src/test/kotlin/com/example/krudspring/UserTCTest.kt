@@ -1,6 +1,7 @@
 package com.example.krudspring
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.groups.Tuple
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -29,20 +30,29 @@ class UserTCTest {
     @Test
     fun `save and update`() {
 
-        val save = users.save(aNewUser("Mike"))
+        val save = users.save(User(null, "Mike", "unhashed", roles = listOf(Role.ADMIN)))
         assertThat(users.findById(save.publicId!!).get().name).isEqualTo("Mike")
-        users.save(anExistingUser(save.publicId!!, "John"))
+        users.save(User(save.publicId!!, "John", "unhashed", roles = listOf(Role.USER)))
         assertThat(users.findById(save.publicId!!).get().name).isEqualTo("John")
+        assertThat(users.findById(save.publicId!!).get().password).isEqualTo("unhashed")
+        assertThat(users.findById(save.publicId!!).get().roles)
+            .map({ it.role })
+            .containsExactlyInAnyOrder(
+                Tuple.tuple(Role.USER)
+            )
     }
 
     @Test
     fun `find by name`() {
-        val mike = users.save(aNewUser("Mike"))
+        val mike = users.save(User(null, "Mike", "unhashed", role = Role.ADMIN))
         assertThat(users.findByName("Mike").get()).isEqualTo(mike)
+        assertThat(users.findByName("Mike").get().roles)
+            .map({ it.role })
+            .containsExactlyInAnyOrder(
+                Tuple.tuple(Role.ADMIN)
+            )
     }
 
 }
 
 
-private fun anExistingUser(publicId: String, name: String) = User(publicId, name)
-private fun aNewUser(name: String) = User(null, name)
