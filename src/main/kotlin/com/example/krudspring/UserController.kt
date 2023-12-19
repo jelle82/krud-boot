@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping
 
 @Controller
 class UserController(
-    private val users: Users
+    private val users: Users,
 ) {
 
 

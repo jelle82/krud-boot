@@ -3,8 +3,10 @@ services:
   db:
     image: "mariadb:10.6.16"
     environment:
-      MARIADB_ROOT_PASSWORD: krud
-      MARIADB_DATABASE: krud
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
 
