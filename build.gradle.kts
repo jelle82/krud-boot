@@ -28,6 +28,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-mysql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("com.oneeyedmen:okeydoke:2.0.3")
 
     implementation("org.springframework.boot:spring-boot-docker-compose")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")

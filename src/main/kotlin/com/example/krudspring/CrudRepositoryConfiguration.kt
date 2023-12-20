@@ -5,9 +5,12 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback
 import org.springframework.stereotype.Component
 import java.util.*
+import javax.sql.DataSource
 
 @Configuration
-class CrudRepositoryConfiguration {
+class CrudRepositoryConfiguration(
+    private val dataSource: DataSource,
+) {
 
     @Bean
     fun customPublicIdForNewUser(publicIdGenerator: PublicIdGenerator): BeforeConvertCallback<DBEntity> {
