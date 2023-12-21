@@ -9,23 +9,23 @@ class RandomUser(
     private val builder: RestClient.Builder,
 ) {
 
-    fun fetchUser(): Results? {
+    fun fetchUser(): List<Person> {
         val restClient: RestClient = builder
             .baseUrl("https://randomuser.me/api/")
             .build()
 
-        return restClient.get().accept(MediaType.APPLICATION_JSON).retrieve().body(Results::class.java)
-
+        return restClient.get().accept(MediaType.APPLICATION_JSON).retrieve().body(Results::class.java)?.results
+            ?: error("Could not fetch user")
     }
 
 }
 
 data class Results(
-    val results: List<Result>,
+    val results: List<Person>,
     val info: Info,
 )
 
-data class Result(
+data class Person(
     val gender: String,
     val name: Name,
     val location: Location,

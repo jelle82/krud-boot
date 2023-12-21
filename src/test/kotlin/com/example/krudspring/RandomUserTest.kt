@@ -1,6 +1,6 @@
 package com.example.krudspring
 
-import org.junit.jupiter.api.Disabled
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
@@ -24,36 +24,40 @@ class RandomUserTest {
     private lateinit var server: MockRestServiceServer
 
     @Test
-    fun name() {
-        val json = readFromFile("user.json")
+    fun `fetch person from random user api`() {
         server
             .expect { "https://randomuser.me/api/" }
             .andRespond {
-                withSuccess(json, MediaType.APPLICATION_JSON)
+                withSuccess(readFromFile("user.json"), MediaType.APPLICATION_JSON)
                     .createResponse(it)
             }
 
-        val user = randomUser.fetchUser()
+        val people = randomUser.fetchUser()
 
-        println("joke = ${user}")
+        assertThat(people).isNotNull
+        assertThat(people).hasSize(1)
+        assertThat(people.get(0).name).isEqualTo(
+            Name(
+                "Mr", "Gumesindo", "Souza"
+            )
+        )
     }
 
-    @Test
-    @Disabled
-    fun saveJson() {
-        val client = HttpClient.newHttpClient()
+}
 
-        val request = HttpRequest
-            .newBuilder()
-            .header("Accept", "application/json")
-            .uri(URI.create("https://randomuser.me/api/"))
-            .GET()
-            .build()
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        saveToFile(response.body(), "user.json")
-    }
+fun saveJson() {
+    val client = HttpClient.newHttpClient()
 
+    val request = HttpRequest
+        .newBuilder()
+        .header("Accept", "application/json")
+        .uri(URI.create("https://randomuser.me/api/"))
+        .GET()
+        .build()
+    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+    saveToFile(response.body(), "user.json")
 }
 
 
