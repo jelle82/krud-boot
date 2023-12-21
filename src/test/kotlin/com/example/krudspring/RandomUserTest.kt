@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.http.MediaType
+import org.springframework.http.client.ClientHttpRequest
 import org.springframework.test.web.client.MockRestServiceServer
+import org.springframework.test.web.client.match.MockRestRequestMatchers
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import java.io.File
 import java.net.URI
@@ -26,11 +28,8 @@ class RandomUserTest {
     @Test
     fun `fetch person from random user api`() {
         server
-            .expect { "https://randomuser.me/api/" }
-            .andRespond {
-                withSuccess(readFromFile("user.json"), MediaType.APPLICATION_JSON)
-                    .createResponse(it)
-            }
+            .expect { it.matches("https://randomuser.me/api/") }
+            .andRespond { it.withJson(readFrom("user.json")) }
 
         val people = randomUser.fetchUser()
 
@@ -46,6 +45,17 @@ class RandomUserTest {
 }
 
 
+fun ClientHttpRequest?.withJson(body: String) =
+    withSuccess(body, MediaType.APPLICATION_JSON)
+        .createResponse(this)
+
+
+fun ClientHttpRequest.matches(url: String) {
+    MockRestRequestMatchers.requestTo(url)
+        .match(this)
+}
+
+
 fun saveJson() {
     val client = HttpClient.newHttpClient()
 
@@ -57,12 +67,12 @@ fun saveJson() {
         .build()
     val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-    saveToFile(response.body(), "user.json")
+    response.body().saveTo("user.json")
 }
 
 
 private const val TEST_FOLDER = "src/test/kotlin/com/example/krudspring"
 
-fun readFromFile(fileName: String): String = File(TEST_FOLDER, fileName).readText()
+fun readFrom(fileName: String, parent: String = TEST_FOLDER): String = File(parent, fileName).readText()
 
-fun saveToFile(content: String, fileName: String) = File(TEST_FOLDER, fileName).writeText(content)
+fun String.saveTo(fileName: String, parent: String = TEST_FOLDER) = File(parent, fileName).writeText(this)
